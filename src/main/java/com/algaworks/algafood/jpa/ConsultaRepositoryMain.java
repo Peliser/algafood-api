@@ -34,50 +34,54 @@ public class ConsultaRepositoryMain {
         Cozinha cozinha2 = new Cozinha();
         cozinha2.setNome("Japonesa");
 
-        cozinha1 = cozinhaRepository.salvar(cozinha1);
-        cozinha2 = cozinhaRepository.salvar(cozinha2);
+        cozinha1 = cozinhaRepository.save(cozinha1);
+        cozinha2 = cozinhaRepository.save(cozinha2);
 
-        Cozinha brasileira = cozinhaRepository.buscar(3L);
+        Cozinha brasileira = cozinhaRepository.findById(3L).orElseThrow();
 
         System.out.printf("%d - %s\n", brasileira.getId(), brasileira.getNome());
+        
+        List<Cozinha> cozinhas = cozinhaRepository.findTodasByNomeContaining("Tailandesa");
+
+        cozinhas.forEach(cozinha -> System.out.printf("findBy: %d - %s\n", cozinha.getId(), cozinha.getNome()));
 
         Cozinha brasileiraMelhor = new Cozinha();
         brasileiraMelhor.setId(brasileira.getId());
         brasileiraMelhor.setNome("Brasileira, a melhor");
-        cozinhaRepository.salvar(brasileiraMelhor);
+        cozinhaRepository.save(brasileiraMelhor);
 //
 //        Cozinha cozinhaRemover = new Cozinha();
 //        cozinhaRemover.setId(1L);
 //        cozinhaRepository.remover(cozinhaRemover);
 
-        List<Cozinha> cozinhas = cozinhaRepository.listar();
+        cozinhas = cozinhaRepository.findAll();
         cozinhas.forEach(cozinha -> System.out.printf("%d - %s\n", cozinha.getId(), cozinha.getNome()));
 
         RestauranteRepository restauranteRepository = context.getBean(RestauranteRepository.class);
 
-        List<Restaurante> restaurantes = restauranteRepository.listar();
+        List<Restaurante> restaurantes = restauranteRepository.findAll();
         restaurantes.forEach(restaurante -> System.out.printf("%d - %s - %s - %s\n", restaurante.getId(),
                 restaurante.getNome(), restaurante.getTaxaFrete().toString(), restaurante.getCozinha().getNome()));
 
         FormaPagamentoRepository formaPagamentoRepository = context.getBean(FormaPagamentoRepository.class);
 
-        List<FormaPagamento> formaPagamentos = formaPagamentoRepository.listar();
+        List<FormaPagamento> formaPagamentos = formaPagamentoRepository.findAll();
         formaPagamentos.forEach(entity -> System.out.printf("%d - %s\n", entity.getId(), entity.getDescricao()));
 
         PermissaoRepository permissaoRepository = context.getBean(PermissaoRepository.class);
 
-        List<Permissao> permissoes = permissaoRepository.listar();
+        List<Permissao> permissoes = permissaoRepository.findAll();
         permissoes.forEach(
                 entity -> System.out.printf("%d - %s - %s\n", entity.getId(), entity.getNome(), entity.getDescricao()));
 
         EstadoRepository estadoRepository = context.getBean(EstadoRepository.class);
 
-        List<Estado> estados = estadoRepository.listar();
+        List<Estado> estados = estadoRepository.findAll();
         estados.forEach(entity -> System.out.printf("%d - %s\n", entity.getId(), entity.getNome()));
 
         CidadeRepository cidadeRepository = context.getBean(CidadeRepository.class);
 
-        List<Cidade> cidades = cidadeRepository.listar();
+        List<Cidade> cidades = cidadeRepository.findAll();
         cidades.forEach(entity -> System.out.printf("%d - %s - %s\n", entity.getId(), entity.getNome(),
                 entity.getEstado().getNome()));
     }

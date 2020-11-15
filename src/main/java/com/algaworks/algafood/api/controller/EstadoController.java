@@ -1,6 +1,7 @@
 package com.algaworks.algafood.api.controller;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
-import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
 import com.algaworks.algafood.domain.service.CadastroEstadoService;
@@ -28,20 +28,20 @@ public class EstadoController {
 
     @Autowired
     private EstadoRepository repository;
-    
+
     @Autowired
     private CadastroEstadoService service;
 
     @GetMapping
     public List<Estado> listar() {
-        return repository.listar();
+        return repository.findAll();
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Estado> buscar(@PathVariable Long id) {
-        Estado entity = repository.buscar(id);
-        if (entity != null) {
-            return ResponseEntity.ok(entity);
+        Optional<Estado> optionalEstado = repository.findById(id);
+        if (optionalEstado.isPresent()) {
+            return ResponseEntity.ok(optionalEstado.get());
         }
         return ResponseEntity.notFound().build();
     }
@@ -58,9 +58,10 @@ public class EstadoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<?> atualizar(@PathVariable Long id, @RequestBody Estado entity) {
-        Estado estado = repository.buscar(id);
-        if (estado != null) {
+        Optional<Estado> optionalEstado = repository.findById(id);
+        if (optionalEstado.isPresent()) {
             try {
+                Estado estado = optionalEstado.get();
                 BeanUtils.copyProperties(entity, estado, "id");
                 estado = service.salvar(estado);
                 return ResponseEntity.ok(estado);
