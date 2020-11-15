@@ -126,14 +126,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/cozinhas/2",
+							"raw": "localhost:8080/cozinhas/3",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"cozinhas",
-								"2"
+								"3"
 							]
 						}
 					},
@@ -189,7 +189,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Chefs\",\r\n    \"taxaFrete\": 2.50,\r\n    \"cozinha\": {\r\n        \"id\": 2\r\n    }\r\n}",
+							"raw": "{\r\n    \"nome\": \"Marukas\",\r\n    \"taxaFrete\": 2.50,\r\n    \"cozinha\": {\r\n        \"id\": 2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -216,7 +216,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 2,\r\n    \"nome\": \"Kakus Beer\",\r\n    \"taxaFrete\": 666,\r\n    \"cozinha\": {\r\n        \"id\": 2,\r\n        \"nome\": \"Indiana\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"nome\": \"Kakus\",\r\n    \"taxaFrete\": 666,\r\n    \"cozinha\": {\r\n        \"id\": 2,\r\n        \"nome\": \"Indiana\"\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -494,6 +494,366 @@
 							"path": [
 								"cidades",
 								"5"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"protocolProfileBehavior": {}
+		},
+		{
+			"name": "teste",
+			"item": [
+				{
+					"name": "/teste/cozinha?nome={nome}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/cozinha?nome=Tailandesa",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"cozinha"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "Tailandesa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/cozinhas?nome={nome}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/cozinhas?nome=Tailandesa",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"cozinhas"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "Tailandesa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/cozinha/exists?nome={nome}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/cozinha/exists?nome=Tailandesa",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"cozinha",
+								"exists"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "Tailandesa"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes?taxaInicial={taxaInicial}&taxaFinal={taxaFinal}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes?taxaInicial=1.50&taxaFinal=1.50",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes"
+							],
+							"query": [
+								{
+									"key": "taxaInicial",
+									"value": "1.50"
+								},
+								{
+									"key": "taxaFinal",
+									"value": "1.50"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/nome-cozinhaId?nome={nome}&cozinhaId={cozinhaId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/nome-cozinhaId?nome=a&cozinhaId=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"nome-cozinhaId"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								},
+								{
+									"key": "cozinhaId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/nome?nome={nome}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/nome?nome=a",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"nome"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/nome-top2?nome={nome}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/nome-top2?nome=a",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"nome-top2"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/count-cozinhaId?cozinhaId={cozinhaId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/count-cozinhaId?cozinhaId=2",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"count-cozinhaId"
+							],
+							"query": [
+								{
+									"key": "cozinhaId",
+									"value": "2"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/nome-cozinhaId-2?nome={nome}&cozinhaId={cozinhaId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/nome-cozinhaId-2?nome=a&cozinhaId=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"nome-cozinhaId-2"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								},
+								{
+									"key": "cozinhaId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/nome-cozinhaId-xml?nome={nome}&cozinhaId={cozinhaId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/nome-cozinhaId-xml?nome=a&cozinhaId=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"nome-cozinhaId-xml"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								},
+								{
+									"key": "cozinhaId",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/nome-frete?nome={nome}&taxaInicial={taxaInicial}&taxaFinal={taxaFinal}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/nome-frete?nome=a&taxaInicial=1",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"nome-frete"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								},
+								{
+									"key": "taxaInicial",
+									"value": "1"
+								},
+								{
+									"key": "taxaFinal",
+									"value": "2",
+									"disabled": true
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/com-frete-gratis?nome={nome}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/com-frete-gratis?nome=a",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"com-frete-gratis"
+							],
+							"query": [
+								{
+									"key": "nome",
+									"value": "a"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/teste/restaurantes/primeiro",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "localhost:8080/teste/restaurantes/primeiro",
+							"host": [
+								"localhost"
+							],
+							"port": "8080",
+							"path": [
+								"teste",
+								"restaurantes",
+								"primeiro"
 							]
 						}
 					},
