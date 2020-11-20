@@ -1,6 +1,7 @@
 package com.algaworks.algafood.domain.exception;
 
-public class EntidadeNaoEncontradaException extends RuntimeException {
+//@ResponseStatus(value = HttpStatus.NOT_FOUND/* , reason = "Entidade não encontrada" */)
+public abstract class EntidadeNaoEncontradaException extends NegocioException {
 
     private static final long serialVersionUID = 1L;
 
