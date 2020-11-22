@@ -126,14 +126,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/cozinhas/3",
+							"raw": "localhost:8080/cozinhas/5",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"cozinhas",
-								"3"
+								"5"
 							]
 						}
 					},
@@ -169,14 +169,14 @@
 						"method": "GET",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/restaurantes/2",
+							"raw": "localhost:8080/restaurantes/1",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"restaurantes",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -189,7 +189,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Marukas\",\r\n    \"taxaFrete\": 2.50,\r\n    \"cozinha\": {\r\n        \"id\": 2\r\n    }\r\n}",
+							"raw": "{\r\n    \"nome\": \"Marukas\",\r\n    \"taxaFrete\": 5,\r\n    \"cozinha\": {\r\n        \"id\": 2\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -216,7 +216,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"id\": 2,\r\n    \"nome\": \"Kakus\",\r\n    \"taxaFrete\": 666,\r\n    \"cozinha\": {\r\n        \"id\": 2,\r\n        \"nome\": \"Indiana\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"id\": 2,\r\n    \"nome\": \"Kakus\",\r\n    \"taxaFrete\": 666,\r\n    \"cozinha\": {\r\n        \"id\": 1\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -224,14 +224,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/restaurantes/2",
+							"raw": "localhost:8080/restaurantes/1",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"restaurantes",
-								"2"
+								"1"
 							]
 						}
 					},
@@ -244,7 +244,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"taxaFrete\": 1.0,\r\n    \"cozinha\": {\r\n        \"id\": 1\r\n    }\r\n}",
+							"raw": "{\r\n    \"taxaFrete\": 0,\r\n    \"cozinha\": {\r\n        \"id\": 1\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -339,7 +339,14 @@
 					"name": "/estados/{id}",
 					"request": {
 						"method": "PUT",
-						"header": [],
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/ecmascript",
+								"type": "text",
+								"disabled": true
+							}
+						],
 						"body": {
 							"mode": "raw",
 							"raw": "{\r\n    \"id\": 4,\r\n    \"nome\": \"Paraná\"\r\n}",
@@ -369,14 +376,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/estados/5",
+							"raw": "localhost:8080/estados/4",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"estados",
-								"5"
+								"4"
 							]
 						}
 					},
@@ -432,7 +439,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Palma Sola\",\r\n    \"estado\": {\r\n        \"id\": 5\r\n    }\r\n}",
+							"raw": "{\r\n    \"nome\": \"Palma Sola\",\r\n    \"estado\": {\r\n        \"id\": 3\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -459,7 +466,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\r\n    \"nome\": \"Chapecó\",\r\n    \"estado\": {\r\n        \"id\": 5,\r\n        \"nome\": \"Santa Catarina\"\r\n    }\r\n}",
+							"raw": "{\r\n    \"nome\": \"Chapecó\",\r\n    \"estado\": {\r\n        \"id\": 1\r\n    }\r\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -467,14 +474,14 @@
 							}
 						},
 						"url": {
-							"raw": "localhost:8080/cidades/6",
+							"raw": "localhost:8080/cidades/1",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"cidades",
-								"6"
+								"1"
 							]
 						}
 					},
@@ -486,14 +493,14 @@
 						"method": "DELETE",
 						"header": [],
 						"url": {
-							"raw": "localhost:8080/cidades/5",
+							"raw": "localhost:8080/cidades/6",
 							"host": [
 								"localhost"
 							],
 							"port": "8080",
 							"path": [
 								"cidades",
-								"5"
+								"6"
 							]
 						}
 					},
