@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.springframework.beans.BeanUtils;
@@ -13,6 +14,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.http.server.ServletServerHttpRequest;
 import org.springframework.util.ReflectionUtils;
+import org.springframework.validation.BeanPropertyBindingResult;
+import org.springframework.validation.SmartValidator;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -41,6 +44,9 @@ public class RestauranteController {
     @Autowired
     private CadastroRestauranteService service;
 
+    @Autowired
+    private SmartValidator validator;
+
     @GetMapping
     public List<Restaurante> listar() {
         return repository.findAll();
@@ -48,15 +54,12 @@ public class RestauranteController {
 
     @GetMapping("/{id}")
     public Restaurante buscar(@PathVariable Long id) {
-        if (true) {
-            throw new IllegalArgumentException("Test");
-        }
         return service.buscar(id);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar(@RequestBody Restaurante entity) {
+    public Restaurante adicionar(@RequestBody @Valid Restaurante entity) {
         try {
             return service.salvar(entity);
         } catch (CozinhaNaoEncontradaException e) {
@@ -65,7 +68,7 @@ public class RestauranteController {
     }
 
     @PutMapping("/{id}")
-    public Restaurante atualizar(@PathVariable Long id, @RequestBody Restaurante entity) {
+    public Restaurante atualizar(@PathVariable Long id, @RequestBody @Valid Restaurante entity) {
         Restaurante restaurante = service.buscar(id);
         BeanUtils.copyProperties(entity, restaurante, "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
         try {
@@ -80,7 +83,16 @@ public class RestauranteController {
             HttpServletRequest request) {
         Restaurante restaurante = service.buscar(id);
         merge(campos, restaurante, request);
+        validate(restaurante, "restaurante");
         return atualizar(id, restaurante);
+    }
+
+    private void validate(Restaurante restaurante, String objectName) {
+        BeanPropertyBindingResult bindingResult = new BeanPropertyBindingResult(restaurante, objectName);
+        validator.validate(repository, bindingResult);
+        if (bindingResult.hasErrors()) {
+            throw new ValidacaoException(bindingResult);
+        }
     }
 
     private void merge(Map<String, Object> camposOrigem, Restaurante restauranteDestino, HttpServletRequest request) {
