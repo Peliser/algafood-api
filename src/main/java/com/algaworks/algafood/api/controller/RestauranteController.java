@@ -3,12 +3,13 @@ package com.algaworks.algafood.api.controller;
 import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.springframework.beans.BeanUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,8 +27,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.model.RestauranteDTO;
+import com.algaworks.algafood.api.model.input.RestauranteInputDTO;
 import com.algaworks.algafood.domain.exception.CozinhaNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
+import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.model.Restaurante;
 import com.algaworks.algafood.domain.repository.RestauranteRepository;
 import com.algaworks.algafood.domain.service.CadastroRestauranteService;
@@ -47,44 +51,55 @@ public class RestauranteController {
     @Autowired
     private SmartValidator validator;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @GetMapping
-    public List<Restaurante> listar() {
-        return repository.findAll();
+    public List<RestauranteDTO> listar() {
+        return repository.findAll().stream().map(entity -> modelMapper.map(entity, RestauranteDTO.class))
+                .collect(Collectors.toList());
     }
 
     @GetMapping("/{id}")
-    public Restaurante buscar(@PathVariable Long id) {
-        return service.buscar(id);
+    public RestauranteDTO buscar(@PathVariable Long id) {
+        final Restaurante restaurante = service.buscar(id);
+        return modelMapper.map(restaurante, RestauranteDTO.class);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Restaurante adicionar(@RequestBody @Valid Restaurante entity) {
+    public RestauranteDTO adicionar(@RequestBody @Valid RestauranteInputDTO entityDto) {
         try {
-            return service.salvar(entity);
+            final Restaurante entity = modelMapper.map(entityDto, Restaurante.class);
+            return modelMapper.map(service.salvar(entity), RestauranteDTO.class);
         } catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
     }
 
     @PutMapping("/{id}")
-    public Restaurante atualizar(@PathVariable Long id, @RequestBody @Valid Restaurante entity) {
+    public RestauranteDTO atualizar(@PathVariable Long id, @RequestBody @Valid RestauranteInputDTO entity) {
         Restaurante restaurante = service.buscar(id);
-        BeanUtils.copyProperties(entity, restaurante, "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
+        // Evitar: org.springframework.orm.jpa.JpaSystemException: identifier of an
+        // instance of com.algaworks.algafood.domain.model.Cozinha was altered from 1 to
+        // 2;
+        restaurante.setCozinha(new Cozinha());
+        modelMapper.map(entity, restaurante);
+//        BeanUtils.copyProperties(entity, restaurante, "id", "formasPagamento", "endereco", "dataCadastro", "produtos");
         try {
-            return service.salvar(restaurante);
+            return modelMapper.map(service.salvar(restaurante), RestauranteDTO.class);
         } catch (CozinhaNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
     }
 
     @PatchMapping("/{id}")
-    public Restaurante atualizarParcial(@PathVariable Long id, @RequestBody Map<String, Object> campos,
+    public RestauranteDTO atualizarParcial(@PathVariable Long id, @RequestBody Map<String, Object> campos,
             HttpServletRequest request) {
         Restaurante restaurante = service.buscar(id);
         merge(campos, restaurante, request);
         validate(restaurante, "restaurante");
-        return atualizar(id, restaurante);
+        return atualizar(id, modelMapper.map(restaurante, RestauranteInputDTO.class));
     }
 
     private void validate(Restaurante restaurante, String objectName) {

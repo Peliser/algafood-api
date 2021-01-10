@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.algaworks.algafood.domain.exception.CidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.EntidadeEmUsoException;
@@ -22,6 +23,7 @@ public class CadastroCidadeService {
     @Autowired
     private CadastroEstadoService cadastroEstadoService;
 
+    @Transactional
     public Cidade salvar(Cidade entity) {
         Long estadoId = entity.getEstado().getId();
         Estado estado = cadastroEstadoService.buscar(estadoId);
@@ -29,9 +31,12 @@ public class CadastroCidadeService {
         return repository.save(entity);
     }
 
+    @Transactional
     public void excluir(Long id) {
         try {
             repository.deleteById(id);
+            // https://www.algaworks.com/aulas/2006/corrigindo-bug-de-tratamento-de-exception-de-integridade-de-dados-com-flush-do-jpa
+            repository.flush();
         } catch (EmptyResultDataAccessException e) {
             throw new CidadeNaoEncontradaException(id);
         } catch (DataIntegrityViolationException e) {

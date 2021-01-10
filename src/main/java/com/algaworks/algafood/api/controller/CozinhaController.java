@@ -1,14 +1,14 @@
 package com.algaworks.algafood.api.controller;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.springframework.beans.BeanUtils;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,7 +19,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.algaworks.algafood.api.model.CozinhaDTO;
 import com.algaworks.algafood.api.model.CozinhasXmlWrapper;
+import com.algaworks.algafood.api.model.input.CozinhaInputDTO;
 import com.algaworks.algafood.domain.model.Cozinha;
 import com.algaworks.algafood.domain.repository.CozinhaRepository;
 import com.algaworks.algafood.domain.service.CadastroCozinhaService;
@@ -34,9 +36,13 @@ public class CozinhaController {
     @Autowired
     private CadastroCozinhaService service;
 
+    @Autowired
+    private ModelMapper modelMapper;
+
     @GetMapping
-    public List<Cozinha> listar() {
-        return repository.findAll();
+    public List<CozinhaDTO> listar() {
+        return repository.findAll().stream().map(entity -> modelMapper.map(entity, CozinhaDTO.class))
+                .collect(Collectors.toList());
     }
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
@@ -45,21 +51,24 @@ public class CozinhaController {
     }
 
     @GetMapping("/{id}")
-    public Cozinha buscar(@PathVariable Long id) {
-        return service.buscar(id);
+    public CozinhaDTO buscar(@PathVariable Long id) {
+        return modelMapper.map(service.buscar(id), CozinhaDTO.class);
     }
 
     @PostMapping
-    public ResponseEntity<Cozinha> adicionar(@RequestBody @Valid Cozinha entity) {
-        entity = service.salvar(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+    @ResponseStatus(HttpStatus.CREATED)
+    public CozinhaDTO adicionar(@RequestBody @Valid CozinhaInputDTO entity) {
+        Cozinha cozinha = modelMapper.map(entity, Cozinha.class);
+        cozinha = service.salvar(cozinha);
+        return modelMapper.map(cozinha, CozinhaDTO.class);
     }
 
     @PutMapping("/{id}")
-    public Cozinha atualizar(@PathVariable Long id, @RequestBody @Valid Cozinha entity) {
+    public CozinhaDTO atualizar(@PathVariable Long id, @RequestBody @Valid CozinhaInputDTO entity) {
         Cozinha cozinha = service.buscar(id);
-        BeanUtils.copyProperties(entity, cozinha, "id");
-        return service.salvar(cozinha);
+        modelMapper.map(entity, cozinha);
+        cozinha = service.salvar(cozinha);
+        return modelMapper.map(cozinha, CozinhaDTO.class);
     }
 
     @DeleteMapping("/{id}")

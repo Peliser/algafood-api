@@ -4,6 +4,11 @@ public class CozinhaNaoEncontradaException extends EntidadeNaoEncontradaExceptio
 
     private static final long serialVersionUID = 1L;
 
+    @Override
+    public synchronized Throwable getCause() {
+        return super.getCause();
+    }
+
     public CozinhaNaoEncontradaException(String mensagem) {
         super(mensagem);
     }
