@@ -5,7 +5,9 @@ import java.math.BigDecimal;
 import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
-import javax.validation.constraints.PositiveOrZero;
+
+import com.algaworks.algafood.core.validation.Multiplo;
+import com.algaworks.algafood.core.validation.TaxaFrete;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -18,11 +20,17 @@ public class RestauranteInputDTO {
     private String nome;
 
     @NotNull
-    @PositiveOrZero
+//  @PositiveOrZero
+    @TaxaFrete
+    @Multiplo(numero = 5)
     private BigDecimal taxaFrete;
 
     @Valid
     @NotNull
     private EntityIdInputDTO cozinha;
+
+    @Valid
+    @NotNull
+    private EnderecoInputDTO endereco;
 
 }

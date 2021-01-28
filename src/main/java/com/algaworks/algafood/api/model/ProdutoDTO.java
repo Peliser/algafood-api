@@ -7,20 +7,16 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class RestauranteDTO {
+public class ProdutoDTO {
 
     private Long id;
 
     private String nome;
 
-    private BigDecimal taxaFrete;
+    private String descricao;
+
+    private BigDecimal preco;
 
     private Boolean ativo;
-
-    private Boolean aberto;
-
-    private CozinhaDTO cozinha;
-
-    private EnderecoDTO endereco;
 
 }

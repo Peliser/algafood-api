@@ -20,12 +20,12 @@ public class CadastroEstadoService {
     private EstadoRepository repository;
 
     @Transactional
-    public Estado salvar(Estado entity) {
+    public Estado salvar(final Estado entity) {
         return repository.save(entity);
     }
 
     @Transactional
-    public void excluir(Long id) {
+    public void excluir(final Long id) {
         try {
             repository.deleteById(id);
             // https://www.algaworks.com/aulas/2006/corrigindo-bug-de-tratamento-de-exception-de-integridade-de-dados-com-flush-do-jpa
@@ -37,7 +37,7 @@ public class CadastroEstadoService {
         }
     }
 
-    public Estado buscar(Long id) {
+    public Estado buscar(final Long id) {
         return repository.findById(id).orElseThrow(() -> new EstadoNaoEncontradoException(id));
     }
 
