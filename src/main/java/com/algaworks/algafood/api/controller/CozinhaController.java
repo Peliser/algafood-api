@@ -7,6 +7,10 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -40,9 +44,11 @@ public class CozinhaController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public List<CozinhaDTO> listar() {
-        return repository.findAll().stream().map(entity -> modelMapper.map(entity, CozinhaDTO.class))
-                .collect(Collectors.toList());
+    public Page<CozinhaDTO> listar(@PageableDefault(size = 2) Pageable pageable) {
+        Page<Cozinha> cozinhasPage = repository.findAll(pageable);
+        List<CozinhaDTO> cozinhas = cozinhasPage.getContent().stream()
+                .map(entity -> modelMapper.map(entity, CozinhaDTO.class)).collect(Collectors.toList());
+        return new PageImpl<>(cozinhas, pageable, cozinhasPage.getTotalElements());
     }
 
     @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)

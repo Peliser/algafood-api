@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,9 +43,14 @@ public class RestauranteProdutoController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public List<ProdutoDTO> listar(@PathVariable Long restauranteId) {
+    public List<ProdutoDTO> listar(@PathVariable Long restauranteId, @RequestParam(required = false) boolean inativos) {
         Restaurante restaurante = cadastroRestaurante.buscar(restauranteId);
-        List<Produto> produtos = produtoRepository.findByRestaurante(restaurante);
+        List<Produto> produtos;
+        if (inativos) {
+            produtos = produtoRepository.findByRestaurante(restaurante);
+        } else {
+            produtos = produtoRepository.findAtivosByRestaurante(restaurante);
+        }
         return produtos.stream().map(produto -> modelMapper.map(produto, ProdutoDTO.class))
                 .collect(Collectors.toList());
     }

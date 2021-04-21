@@ -7,6 +7,10 @@ import javax.validation.Valid;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -19,12 +23,16 @@ import org.springframework.web.bind.annotation.RestController;
 import com.algaworks.algafood.api.model.PedidoDTO;
 import com.algaworks.algafood.api.model.PedidoResumoDTO;
 import com.algaworks.algafood.api.model.input.PedidoInputDTO;
+import com.algaworks.algafood.core.data.PageableHandler;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.exception.NegocioException;
+import com.algaworks.algafood.domain.filter.PedidoFilter;
 import com.algaworks.algafood.domain.model.Pedido;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.PedidoRepository;
 import com.algaworks.algafood.domain.service.EmissaoPedidoService;
+import com.algaworks.algafood.infrastructure.repository.spec.PedidoSpecs;
+import com.google.common.collect.ImmutableMap;
 
 @RestController
 @RequestMapping(value = "/pedidos")
@@ -40,11 +48,33 @@ public class PedidoController {
     private ModelMapper modelMapper;
 
     @GetMapping
-    public List<PedidoResumoDTO> listar() {
-        List<Pedido> pedidos = pedidoRepository.findAll();
-        return pedidos.stream().map(pedido -> modelMapper.map(pedido, PedidoResumoDTO.class))
-                .collect(Collectors.toList());
+    public Page<PedidoResumoDTO> pesquisar(PedidoFilter filtro, @PageableDefault(size = 10) Pageable pageable) {
+        pageable = handlePageable(pageable);
+        Page<Pedido> pedidosPage = pedidoRepository.findAll(PedidoSpecs.usandoFiltro(filtro), pageable);
+        List<PedidoResumoDTO> pedidos = pedidosPage.getContent().stream()
+                .map(pedido -> modelMapper.map(pedido, PedidoResumoDTO.class)).collect(Collectors.toList());
+        return new PageImpl<>(pedidos, pageable, pedidosPage.getTotalElements());
     }
+
+//    @GetMapping
+//    public MappingJacksonValue listar(@RequestParam(required = false) String campos) {
+//        List<Pedido> pedidos = pedidoRepository.findAll();
+//        List<PedidoResumoDTO> pedidosDtos = pedidos.stream()
+//                .map(pedido -> modelMapper.map(pedido, PedidoResumoDTO.class)).collect(Collectors.toList());
+//
+//        SimpleFilterProvider filterProvider = new SimpleFilterProvider();
+//        SimpleBeanPropertyFilter pedidoFilter;
+//        if (StringUtils.isNotBlank(campos)) {
+//            pedidoFilter = SimpleBeanPropertyFilter.filterOutAllExcept(campos.split(","));
+//        } else {
+//            pedidoFilter = SimpleBeanPropertyFilter.serializeAll();
+//        }
+//        filterProvider.addFilter("pedidoFilter", pedidoFilter);
+//
+//        MappingJacksonValue wrapper = new MappingJacksonValue(pedidosDtos);
+//        wrapper.setFilters(filterProvider);
+//        return wrapper;
+//    }
 
     @GetMapping("/{codigo}")
     public PedidoDTO buscar(@PathVariable String codigo) {
@@ -65,6 +95,12 @@ public class PedidoController {
         } catch (EntidadeNaoEncontradaException e) {
             throw new NegocioException(e.getMessage(), e);
         }
+    }
+
+    private Pageable handlePageable(Pageable pageable) {
+        ImmutableMap<String, String> mapeamento = ImmutableMap.of("codigo", "codigo", "restaurante.nome",
+                "restaurante.nome", "cliente.nome", "cliente.nome");
+        return PageableHandler.handle(pageable, mapeamento);
     }
 
 }

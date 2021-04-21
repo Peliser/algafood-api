@@ -2,6 +2,9 @@ package com.algaworks.algafood.api.model;
 
 import java.math.BigDecimal;
 
+import com.algaworks.algafood.api.model.view.RestauranteView;
+import com.fasterxml.jackson.annotation.JsonView;
+
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,16 +12,20 @@ import lombok.Setter;
 @Setter
 public class RestauranteDTO {
 
+    @JsonView({ RestauranteView.Resumo.class, RestauranteView.ApenasNome.class })
     private Long id;
 
+    @JsonView({ RestauranteView.Resumo.class, RestauranteView.ApenasNome.class })
     private String nome;
 
+    @JsonView(RestauranteView.Resumo.class)
     private BigDecimal taxaFrete;
 
     private Boolean ativo;
 
     private Boolean aberto;
 
+    @JsonView(RestauranteView.Resumo.class)
     private CozinhaDTO cozinha;
 
     private EnderecoDTO endereco;
