@@ -12,6 +12,9 @@ delete from restaurante;
 delete from restaurante_forma_pagamento;
 delete from usuario;
 delete from usuario_grupo;
+delete from pedido;
+delete from item_pedido;
+delete from foto_produto;
 
 set foreign_key_checks = 1;
 
