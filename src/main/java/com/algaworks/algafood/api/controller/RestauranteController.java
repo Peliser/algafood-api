@@ -45,6 +45,8 @@ import com.algaworks.algafood.domain.service.CadastroRestauranteService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+//@CrossOrigin(origins = "http://www.algafood.local:8000")
+//@CrossOrigin(maxAge = 10)
 @RestController
 @RequestMapping("/restaurantes")
 public class RestauranteController {
@@ -76,6 +78,14 @@ public class RestauranteController {
         }
         return wrapper;
     }
+
+//    @GetMapping
+//    public ResponseEntity<List<RestauranteDTO>> listar() {
+//        final List<RestauranteDTO> list = repository.findAll().stream()
+//                .map(entity -> modelMapper.map(entity, RestauranteDTO.class)).collect(Collectors.toList());
+//        return ResponseEntity.ok().header(HttpHeaders.ACCESS_CONTROL_ALLOW_ORIGIN, "http://www.algafood.local:8000")
+//                .body(list);
+//    }
 
 //    @GetMapping
 //    public List<RestauranteDTO> listar() {
