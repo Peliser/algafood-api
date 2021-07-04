@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.algaworks.algafood.api.model.FotoProdutoDTO;
-import com.algaworks.algafood.api.model.input.FotoProdutoInputDTO;
+import com.algaworks.algafood.api.model.FotoProdutoModel;
+import com.algaworks.algafood.api.model.input.FotoProdutoInput;
 import com.algaworks.algafood.api.openapi.controller.RestauranteProdutoFotoControllerOpenApi;
 import com.algaworks.algafood.domain.exception.EntidadeNaoEncontradaException;
 import com.algaworks.algafood.domain.model.FotoProduto;
@@ -52,8 +52,8 @@ public class RestauranteProdutoFotoController implements RestauranteProdutoFotoC
     private FotoStorageService fotoStorageService;
 
     @PutMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public FotoProdutoDTO upload(@PathVariable Long restauranteId, @PathVariable Long produtoId,
-            @Valid FotoProdutoInputDTO dto, @RequestPart(required = true) MultipartFile arquivo) throws IOException {
+    public FotoProdutoModel upload(@PathVariable Long restauranteId, @PathVariable Long produtoId,
+            @Valid FotoProdutoInput dto, @RequestPart(required = true) MultipartFile arquivo) throws IOException {
 //        var arquivo = dto.getArquivo();
         var produto = cadastroProdutoService.buscar(restauranteId, produtoId);
         var fotoProduto = new FotoProduto();
@@ -65,13 +65,13 @@ public class RestauranteProdutoFotoController implements RestauranteProdutoFotoC
 
         fotoProduto = service.salvar(fotoProduto, arquivo.getInputStream());
 
-        return modelMapper.map(fotoProduto, FotoProdutoDTO.class);
+        return modelMapper.map(fotoProduto, FotoProdutoModel.class);
     }
 
     @GetMapping
-    public FotoProdutoDTO buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId) {
+    public FotoProdutoModel buscar(@PathVariable Long restauranteId, @PathVariable Long produtoId) {
         FotoProduto fotoProduto = service.buscar(restauranteId, produtoId);
-        return modelMapper.map(fotoProduto, FotoProdutoDTO.class);
+        return modelMapper.map(fotoProduto, FotoProdutoModel.class);
     }
 
     @GetMapping(produces = MediaType.ALL_VALUE)

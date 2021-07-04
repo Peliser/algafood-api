@@ -1,12 +1,11 @@
 package com.algaworks.algafood.api.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,10 +16,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algaworks.algafood.api.model.UsuarioDTO;
-import com.algaworks.algafood.api.model.input.SenhaInputDTO;
-import com.algaworks.algafood.api.model.input.UsuarioComSenhaInputDTO;
-import com.algaworks.algafood.api.model.input.UsuarioInputDTO;
+import com.algaworks.algafood.api.assembler.UsuarioInputDisassembler;
+import com.algaworks.algafood.api.assembler.UsuarioModelAssembler;
+import com.algaworks.algafood.api.model.UsuarioModel;
+import com.algaworks.algafood.api.model.input.SenhaInput;
+import com.algaworks.algafood.api.model.input.UsuarioComSenhaInput;
+import com.algaworks.algafood.api.model.input.UsuarioInput;
 import com.algaworks.algafood.api.openapi.controller.UsuarioControllerOpenApi;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.repository.UsuarioRepository;
@@ -37,40 +38,52 @@ public class UsuarioController implements UsuarioControllerOpenApi {
     private CadastroUsuarioService cadastroUsuario;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private UsuarioModelAssembler usuarioModelAssembler;
 
+    @Autowired
+    private UsuarioInputDisassembler usuarioInputDisassembler;
+
+    @Override
     @GetMapping
-    public List<UsuarioDTO> listar() {
-        return usuarioRepository.findAll().stream().map(entity -> modelMapper.map(entity, UsuarioDTO.class))
-                .collect(Collectors.toList());
+    public CollectionModel<UsuarioModel> listar() {
+        List<Usuario> todasUsuarios = usuarioRepository.findAll();
+
+        return usuarioModelAssembler.toCollectionModel(todasUsuarios);
     }
 
+    @Override
     @GetMapping("/{usuarioId}")
-    public UsuarioDTO buscar(@PathVariable Long usuarioId) {
+    public UsuarioModel buscar(@PathVariable Long usuarioId) {
         Usuario usuario = cadastroUsuario.buscar(usuarioId);
-        return modelMapper.map(usuario, UsuarioDTO.class);
+
+        return usuarioModelAssembler.toModel(usuario);
     }
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public UsuarioDTO adicionar(@RequestBody @Valid UsuarioComSenhaInputDTO usuarioInput) {
-        Usuario usuario = modelMapper.map(usuarioInput, Usuario.class);
+    public UsuarioModel adicionar(@RequestBody @Valid UsuarioComSenhaInput usuarioInput) {
+        Usuario usuario = usuarioInputDisassembler.toDomainObject(usuarioInput);
         usuario = cadastroUsuario.salvar(usuario);
-        return modelMapper.map(usuario, UsuarioDTO.class);
+
+        return usuarioModelAssembler.toModel(usuario);
     }
 
-    @PutMapping("/{id}")
-    public UsuarioDTO atualizar(@PathVariable Long id, @RequestBody @Valid UsuarioInputDTO entityDto) {
-        Usuario usuario = cadastroUsuario.buscar(id);
-        modelMapper.map(entityDto, usuario);
-        usuario = cadastroUsuario.salvar(usuario);
-        return modelMapper.map(usuario, UsuarioDTO.class);
+    @Override
+    @PutMapping("/{usuarioId}")
+    public UsuarioModel atualizar(@PathVariable Long usuarioId, @RequestBody @Valid UsuarioInput usuarioInput) {
+        Usuario usuarioAtual = cadastroUsuario.buscar(usuarioId);
+        usuarioInputDisassembler.copyToDomainObject(usuarioInput, usuarioAtual);
+        usuarioAtual = cadastroUsuario.salvar(usuarioAtual);
+
+        return usuarioModelAssembler.toModel(usuarioAtual);
     }
 
-    @PutMapping("/{id}/senha")
+    @Override
+    @PutMapping("/{usuarioId}/senha")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void alterarSenha(@PathVariable Long id, @RequestBody @Valid SenhaInputDTO senhaInputDto) {
-        cadastroUsuario.alterarSenha(id, senhaInputDto.getSenhaAtual(), senhaInputDto.getNovaSenha());
+    public void alterarSenha(@PathVariable Long usuarioId, @RequestBody @Valid SenhaInput senha) {
+        cadastroUsuario.alterarSenha(usuarioId, senha.getSenhaAtual(), senha.getNovaSenha());
     }
 
 }

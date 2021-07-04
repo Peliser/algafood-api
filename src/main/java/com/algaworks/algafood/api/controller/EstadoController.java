@@ -1,12 +1,11 @@
 package com.algaworks.algafood.api.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 import javax.validation.Valid;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,8 +17,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algaworks.algafood.api.model.EstadoDTO;
-import com.algaworks.algafood.api.model.input.EstadoInputDTO;
+import com.algaworks.algafood.api.assembler.EstadoInputDisassembler;
+import com.algaworks.algafood.api.assembler.EstadoModelAssembler;
+import com.algaworks.algafood.api.model.EstadoModel;
+import com.algaworks.algafood.api.model.input.EstadoInput;
 import com.algaworks.algafood.api.openapi.controller.EstadoControllerOpenApi;
 import com.algaworks.algafood.domain.model.Estado;
 import com.algaworks.algafood.domain.repository.EstadoRepository;
@@ -33,42 +34,58 @@ public class EstadoController implements EstadoControllerOpenApi {
     private EstadoRepository repository;
 
     @Autowired
-    private CadastroEstadoService service;
+    private CadastroEstadoService cadastroEstadoService;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private EstadoModelAssembler estadoModelAssembler;
 
+    @Autowired
+    private EstadoInputDisassembler estadoInputDisassembler;
+
+    @Override
     @GetMapping
-    public List<EstadoDTO> listar() {
-        return repository.findAll().stream().map(entity -> modelMapper.map(entity, EstadoDTO.class))
-                .collect(Collectors.toList());
+    public CollectionModel<EstadoModel> listar() {
+        List<Estado> todosEstados = repository.findAll();
+
+        return estadoModelAssembler.toCollectionModel(todosEstados);
     }
 
-    @GetMapping("/{id}")
-    public EstadoDTO buscar(@PathVariable Long id) {
-        return modelMapper.map(service.buscar(id), EstadoDTO.class);
+    @Override
+    @GetMapping("/{estadoId}")
+    public EstadoModel buscar(@PathVariable Long estadoId) {
+        Estado estado = cadastroEstadoService.buscar(estadoId);
+
+        return estadoModelAssembler.toModel(estado);
     }
 
+    @Override
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public EstadoDTO adicionar(@RequestBody @Valid EstadoInputDTO entity) {
-        Estado estado = modelMapper.map(entity, Estado.class);
-        estado = service.salvar(estado);
-        return modelMapper.map(estado, EstadoDTO.class);
+    public EstadoModel adicionar(@RequestBody @Valid EstadoInput estadoInput) {
+        Estado estado = estadoInputDisassembler.toDomainObject(estadoInput);
+
+        estado = cadastroEstadoService.salvar(estado);
+
+        return estadoModelAssembler.toModel(estado);
     }
 
-    @PutMapping("/{id}")
-    public EstadoDTO atualizar(@PathVariable Long id, @RequestBody @Valid EstadoInputDTO entity) {
-        Estado estado = service.buscar(id);
-        modelMapper.map(estado, estado);
-        estado = service.salvar(estado);
-        return modelMapper.map(estado, EstadoDTO.class);
+    @Override
+    @PutMapping("/{estadoId}")
+    public EstadoModel atualizar(@PathVariable Long estadoId, @RequestBody @Valid EstadoInput estadoInput) {
+        Estado estadoAtual = cadastroEstadoService.buscar(estadoId);
+
+        estadoInputDisassembler.copyToDomainObject(estadoInput, estadoAtual);
+
+        estadoAtual = cadastroEstadoService.salvar(estadoAtual);
+
+        return estadoModelAssembler.toModel(estadoAtual);
     }
 
-    @DeleteMapping("/{id}")
+    @Override
+    @DeleteMapping("/{estadoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void remover(@PathVariable Long id) {
-        service.excluir(id);
+    public void remover(@PathVariable Long estadoId) {
+        cadastroEstadoService.excluir(estadoId);
     }
 
 }

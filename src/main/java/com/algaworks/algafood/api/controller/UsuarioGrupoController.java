@@ -1,11 +1,10 @@
 package com.algaworks.algafood.api.controller;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,38 +13,57 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algaworks.algafood.api.model.GrupoDTO;
+import com.algaworks.algafood.api.AlgaLinks;
+import com.algaworks.algafood.api.assembler.GrupoModelAssembler;
+import com.algaworks.algafood.api.model.GrupoModel;
 import com.algaworks.algafood.api.openapi.controller.UsuarioGrupoControllerOpenApi;
 import com.algaworks.algafood.domain.model.Usuario;
 import com.algaworks.algafood.domain.service.CadastroUsuarioService;
 
 @RestController
-@RequestMapping(value = "/usuarios/{id}/grupos")
+@RequestMapping(path = "/usuarios/{usuarioId}/grupos", produces = MediaType.APPLICATION_JSON_VALUE)
 public class UsuarioGrupoController implements UsuarioGrupoControllerOpenApi {
 
     @Autowired
-    private CadastroUsuarioService cadastroUsuario;
+    private CadastroUsuarioService service;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private GrupoModelAssembler grupoModelAssembler;
 
+    @Autowired
+    private AlgaLinks algaLinks;
+
+    @Override
     @GetMapping
-    public List<GrupoDTO> listar(@PathVariable Long id) {
-        Usuario usuario = cadastroUsuario.buscar(id);
-        return usuario.getGrupos().stream().map(grupo -> modelMapper.map(grupo, GrupoDTO.class))
-                .collect(Collectors.toList());
+    public CollectionModel<GrupoModel> listar(@PathVariable Long usuarioId) {
+        Usuario usuario = service.buscar(usuarioId);
+
+        CollectionModel<GrupoModel> gruposModel = grupoModelAssembler.toCollectionModel(usuario.getGrupos())
+                .removeLinks().add(algaLinks.linkToUsuarioGrupoAssociacao(usuarioId, "associar"));
+
+        gruposModel.getContent().forEach(grupoModel -> {
+            grupoModel.add(algaLinks.linkToUsuarioGrupoDesassociacao(usuarioId, grupoModel.getId(), "desassociar"));
+        });
+
+        return gruposModel;
     }
 
-    @PutMapping("/{grupoId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void associar(@PathVariable Long id, @PathVariable Long grupoId) {
-        cadastroUsuario.associarGrupo(id, grupoId);
-    }
-
+    @Override
     @DeleteMapping("/{grupoId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void desassociar(@PathVariable Long id, @PathVariable Long grupoId) {
-        cadastroUsuario.desassociarGrupo(id, grupoId);
+    public ResponseEntity<Void> desassociar(@PathVariable Long usuarioId, @PathVariable Long grupoId) {
+        service.desassociarGrupo(usuarioId, grupoId);
+
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    @PutMapping("/{grupoId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public ResponseEntity<Void> associar(@PathVariable Long usuarioId, @PathVariable Long grupoId) {
+        service.associarGrupo(usuarioId, grupoId);
+
+        return ResponseEntity.noContent().build();
     }
 
 }

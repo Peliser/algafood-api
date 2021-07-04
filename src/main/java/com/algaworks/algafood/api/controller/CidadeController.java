@@ -1,10 +1,9 @@
 package com.algaworks.algafood.api.controller;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -17,8 +16,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.algaworks.algafood.api.model.CidadeDTO;
-import com.algaworks.algafood.api.model.input.CidadeInputDTO;
+import com.algaworks.algafood.api.ResourceUriHelper;
+import com.algaworks.algafood.api.assembler.CidadeInputDisassembler;
+import com.algaworks.algafood.api.assembler.CidadeModelAssembler;
+import com.algaworks.algafood.api.model.CidadeModel;
+import com.algaworks.algafood.api.model.input.CidadeInput;
 import com.algaworks.algafood.api.openapi.controller.CidadeControllerOpenApi;
 import com.algaworks.algafood.domain.exception.EstadoNaoEncontradoException;
 import com.algaworks.algafood.domain.exception.NegocioException;
@@ -37,38 +39,50 @@ public class CidadeController implements CidadeControllerOpenApi {
     private CadastroCidadeService service;
 
     @Autowired
-    private ModelMapper modelMapper;
+    private CidadeModelAssembler assembler;
+
+    @Autowired
+    private CidadeModelAssembler cidadeModelAssembler;
+
+    @Autowired
+    private CidadeInputDisassembler cidadeInputDisassembler;
 
     @GetMapping
-    public List<CidadeDTO> listar() {
-        return repository.findAll().stream().map(entity -> modelMapper.map(entity, CidadeDTO.class))
-                .collect(Collectors.toList());
+    public CollectionModel<CidadeModel> listar() {
+        List<Cidade> cidades = repository.findAll();
+        return assembler.toCollectionModel(cidades);
     }
 
     @GetMapping("/{id}")
-    public CidadeDTO buscar(@PathVariable Long id) {
-        return modelMapper.map(service.buscar(id), CidadeDTO.class);
+    public CidadeModel buscar(@PathVariable Long id) {
+        Cidade cidade = service.buscar(id);
+        return assembler.toModel(cidade);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public CidadeDTO adicionar(@RequestBody CidadeInputDTO entity) {
+    public CidadeModel adicionar(@RequestBody CidadeInput cidadeInput) {
         try {
-            Cidade cidade = modelMapper.map(entity, Cidade.class);
+            Cidade cidade = cidadeInputDisassembler.toDomainObject(cidadeInput);
             cidade = service.salvar(cidade);
-            return modelMapper.map(cidade, CidadeDTO.class);
+            CidadeModel cidadeModel = assembler.toModel(cidade);
+            ResourceUriHelper.addUriResponseHeader(cidadeModel.getId());
+            return cidadeModel;
         } catch (EstadoNaoEncontradoException e) {
             throw new NegocioException(e.getMessage(), e);
         }
     }
 
     @PutMapping("/{id}")
-    public CidadeDTO atualizar(@PathVariable Long id, @RequestBody CidadeInputDTO entity) {
+    public CidadeModel atualizar(@PathVariable Long id, @RequestBody CidadeInput cidadeInput) {
         try {
-            Cidade cidade = service.buscar(id);
-            modelMapper.map(entity, cidade);
-            cidade = service.salvar(cidade);
-            return modelMapper.map(cidade, CidadeDTO.class);
+            Cidade cidadeAtual = service.buscar(id);
+
+            cidadeInputDisassembler.copyToDomainObject(cidadeInput, cidadeAtual);
+
+            cidadeAtual = service.salvar(cidadeAtual);
+
+            return cidadeModelAssembler.toModel(cidadeAtual);
         } catch (EstadoNaoEncontradoException e) {
             throw new NegocioException(e.getMessage(), e);
         }
