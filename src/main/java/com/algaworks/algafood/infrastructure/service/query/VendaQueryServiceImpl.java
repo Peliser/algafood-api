@@ -16,8 +16,6 @@ import com.algaworks.algafood.domain.model.StatusPedido;
 import com.algaworks.algafood.domain.model.aggregate.VendaDiaria;
 import com.algaworks.algafood.domain.service.VendaQueryService;
 
-import lombok.var;
-
 @Repository
 public class VendaQueryServiceImpl implements VendaQueryService {
 
