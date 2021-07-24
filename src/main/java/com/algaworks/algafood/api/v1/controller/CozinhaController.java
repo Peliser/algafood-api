@@ -9,6 +9,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,77 +37,78 @@ import lombok.extern.slf4j.Slf4j;
 @RequestMapping("/v1/cozinhas")
 public class CozinhaController implements CozinhaControllerOpenApi {
 
-    @Autowired
-    private CozinhaRepository repository;
+	@Autowired
+	private CozinhaRepository repository;
 
-    @Autowired
-    private CadastroCozinhaService cadastroCozinhaService;
+	@Autowired
+	private CadastroCozinhaService cadastroCozinhaService;
 
-    @Autowired
-    private CozinhaModelAssembler cozinhaModelAssembler;
+	@Autowired
+	private CozinhaModelAssembler cozinhaModelAssembler;
 
-    @Autowired
-    private CozinhaInputDisassembler cozinhaInputDisassembler;
+	@Autowired
+	private CozinhaInputDisassembler cozinhaInputDisassembler;
 
-    @Autowired
-    private PagedResourcesAssembler<Cozinha> pagedResorucesAssembler;
+	@Autowired
+	private PagedResourcesAssembler<Cozinha> pagedResorucesAssembler;
 
-    @CheckSecurity.Cozinhas.PodeConsultar
-    @Override
-    @GetMapping
-    public PagedModel<CozinhaModel> listar(@PageableDefault(size = 10) Pageable pageable) {
-        log.info("Consultando {} cozinhas...", pageable.getPageSize());
+	@CheckSecurity.Cozinhas.PodeConsultar
+	@Override
+	@GetMapping
+	public PagedModel<CozinhaModel> listar(@PageableDefault(size = 10) Pageable pageable) {
+		log.info("Authorities: {}", SecurityContextHolder.getContext().getAuthentication().getAuthorities());
+		log.info("Consultando {} cozinhas...", pageable.getPageSize());
 
-        Page<Cozinha> cozinhasPage = repository.findAll(pageable);
+		Page<Cozinha> cozinhasPage = repository.findAll(pageable);
 
-        PagedModel<CozinhaModel> cozinhasPagedModel = pagedResorucesAssembler.toModel(cozinhasPage,
-                cozinhaModelAssembler);
+		PagedModel<CozinhaModel> cozinhasPagedModel = pagedResorucesAssembler.toModel(cozinhasPage,
+				cozinhaModelAssembler);
 
-        return cozinhasPagedModel;
-    }
+		return cozinhasPagedModel;
+	}
 
 //    @GetMapping(produces = MediaType.APPLICATION_XML_VALUE)
 //    public CozinhasXmlWrapper listarXml() {
 //        return new CozinhasXmlWrapper(repository.findAll());
 //    }
 
-    @CheckSecurity.Cozinhas.PodeConsultar
-    @Override
-    @GetMapping("/{cozinhaId}")
-    public CozinhaModel buscar(@PathVariable Long cozinhaId) {
-        Cozinha cozinha = cadastroCozinhaService.buscar(cozinhaId);
+	@CheckSecurity.Cozinhas.PodeConsultar
+	@Override
+	@GetMapping("/{cozinhaId}")
+	public CozinhaModel buscar(@PathVariable Long cozinhaId) {
+		Cozinha cozinha = cadastroCozinhaService.buscar(cozinhaId);
 
-        return cozinhaModelAssembler.toModel(cozinha);
-    }
+		return cozinhaModelAssembler.toModel(cozinha);
+	}
 
-    @CheckSecurity.Cozinhas.PodeEditar
-    @Override
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    public CozinhaModel adicionar(@RequestBody @Valid CozinhaInput cozinhaInput) {
-        Cozinha cozinha = cozinhaInputDisassembler.toDomainObject(cozinhaInput);
-        cozinha = cadastroCozinhaService.salvar(cozinha);
+	@CheckSecurity.Cozinhas.PodeEditar
+	@Override
+	@PostMapping
+	@ResponseStatus(HttpStatus.CREATED)
+	public CozinhaModel adicionar(@RequestBody @Valid CozinhaInput cozinhaInput) {
+		Cozinha cozinha = cozinhaInputDisassembler.toDomainObject(cozinhaInput);
+		cozinha = cadastroCozinhaService.salvar(cozinha);
 
-        return cozinhaModelAssembler.toModel(cozinha);
-    }
+		return cozinhaModelAssembler.toModel(cozinha);
+	}
 
-    @CheckSecurity.Cozinhas.PodeEditar
-    @Override
-    @PutMapping("/{cozinhaId}")
-    public CozinhaModel atualizar(@PathVariable Long cozinhaId, @RequestBody @Valid CozinhaInput cozinhaInput) {
-        Cozinha cozinhaAtual = cadastroCozinhaService.buscar(cozinhaId);
-        cozinhaInputDisassembler.copyToDomainObject(cozinhaInput, cozinhaAtual);
-        cozinhaAtual = cadastroCozinhaService.salvar(cozinhaAtual);
+	@CheckSecurity.Cozinhas.PodeEditar
+	@Override
+	@PutMapping("/{cozinhaId}")
+	public CozinhaModel atualizar(@PathVariable Long cozinhaId, @RequestBody @Valid CozinhaInput cozinhaInput) {
+		Cozinha cozinhaAtual = cadastroCozinhaService.buscar(cozinhaId);
+		cozinhaInputDisassembler.copyToDomainObject(cozinhaInput, cozinhaAtual);
+		cozinhaAtual = cadastroCozinhaService.salvar(cozinhaAtual);
 
-        return cozinhaModelAssembler.toModel(cozinhaAtual);
-    }
+		return cozinhaModelAssembler.toModel(cozinhaAtual);
+	}
 
-    @CheckSecurity.Cozinhas.PodeEditar
-    @Override
-    @DeleteMapping("/{cozinhaId}")
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void remover(@PathVariable Long cozinhaId) {
-        cadastroCozinhaService.excluir(cozinhaId);
-    }
+	@CheckSecurity.Cozinhas.PodeEditar
+	@Override
+	@DeleteMapping("/{cozinhaId}")
+	@ResponseStatus(HttpStatus.NO_CONTENT)
+	public void remover(@PathVariable Long cozinhaId) {
+		cadastroCozinhaService.excluir(cozinhaId);
+	}
 
 }
