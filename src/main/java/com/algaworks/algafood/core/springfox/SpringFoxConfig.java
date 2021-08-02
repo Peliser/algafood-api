@@ -87,7 +87,7 @@ public class SpringFoxConfig implements WebMvcConfigurer {
         TypeResolver typeResolver = new TypeResolver();
         return new Docket(DocumentationType.SWAGGER_2).groupName("V1").select()
                 .apis(RequestHandlerSelectors.basePackage("com.algaworks.algafood.api"))
-                .paths(PathSelectors.ant("/v1/*")).build().useDefaultResponseMessages(false)
+                .paths(PathSelectors.ant("/v1/**")).build().useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, globalGetResponseMessages())
                 .globalResponseMessage(RequestMethod.POST, globalPostPutResponseMessages())
                 .globalResponseMessage(RequestMethod.PUT, globalPostPutResponseMessages())
@@ -163,7 +163,7 @@ public class SpringFoxConfig implements WebMvcConfigurer {
         TypeResolver typeResolver = new TypeResolver();
         return new Docket(DocumentationType.SWAGGER_2).groupName("V2").select()
                 .apis(RequestHandlerSelectors.basePackage("com.algaworks.algafood.api"))
-                .paths(PathSelectors.ant("/v2/*")).build().useDefaultResponseMessages(false)
+                .paths(PathSelectors.ant("/v2/**")).build().useDefaultResponseMessages(false)
                 .globalResponseMessage(RequestMethod.GET, globalGetResponseMessages())
                 .globalResponseMessage(RequestMethod.POST, globalPostPutResponseMessages())
                 .globalResponseMessage(RequestMethod.PUT, globalPostPutResponseMessages())
