@@ -544,19 +544,7 @@
 					"name": "/estados",
 					"request": {
 						"auth": {
-							"type": "basic",
-							"basic": [
-								{
-									"key": "password",
-									"value": "123456",
-									"type": "string"
-								},
-								{
-									"key": "username",
-									"value": "algafood",
-									"type": "string"
-								}
-							]
+							"type": "noauth"
 						},
 						"method": "GET",
 						"header": [
@@ -2878,7 +2866,7 @@
 							"urlencoded": [
 								{
 									"key": "code",
-									"value": "x230hd",
+									"value": "9U4VWM",
 									"type": "text"
 								},
 								{
@@ -3163,6 +3151,23 @@
 					"path": [
 						"v2",
 						"api-docs"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/host-check",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}/host-check",
+					"host": [
+						"{{BASE_URL}}"
+					],
+					"path": [
+						"host-check"
 					]
 				}
 			},
