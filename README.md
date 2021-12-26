@@ -1,3 +1,3 @@
 # algafood-api
 
-Projeto AlgaFood API do curso Especialista Spring Rest da AlgaWorks.
+AlgaFood API project of Specialist Spring Rest course at AlgaWorks.
